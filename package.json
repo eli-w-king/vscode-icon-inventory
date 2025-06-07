@@ -1,0 +1,22 @@
+{
+  "name": "vs-code-icon-inventory",
+  "version": "1.0.0",
+  "description": "A tool to inventory and visualize icons used in Visual Studio Code",
+  "main": "icon-inventory-gen.js",
+  "scripts": {
+    "generate": "node icon-inventory-gen.js",
+    "generate:cjs": "node icon-inventory-gen.cjs"
+  },
+  "keywords": [
+    "vscode",
+    "icons",
+    "inventory",
+    "visualization"
+  ],
+  "author": "Microsoft Corporation",
+  "license": "MIT",
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

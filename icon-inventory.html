@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VS Code Icon Inventory</title>
+  <link rel="stylesheet" href="https://microsoft.github.io/vscode-codicons/dist/codicon.css">
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 400;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.01em;
+    }
+    .stats {
+      color: #bbb;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      align-items: center;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.5rem 1rem;
+      border: 1px solid #222;
+      border-radius: 6px;
+      font-size: 1rem;
+      background: #181818;
+      color: #fff;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: #fff;
+    }
+    .filter-section {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0;
+    }
+    .checkbox-group input[type="checkbox"] {
+      accent-color: #fff;
+    }
+    .view-toggle {
+      display: flex;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      overflow: hidden;
+      gap: 0.5rem;
+    }
+    .view-btn {
+      padding: 0.5rem 0.7rem;
+      border: none;
+      background: #181818;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1.1rem;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .view-btn.active, .view-btn:hover {
+      background: #fff;
+      color: #111;
+    }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .icon-card {
+      background: #181818;
+      border-radius: 8px;
+      padding: 1.2rem 0.5rem 0.7rem 0.5rem;
+      text-align: center;
+      box-shadow: none;
+      border: 1px solid #222;
+      cursor: pointer;
+      transition: border 0.15s;
+    }
+    .icon-card:hover {
+      border: 1.5px solid #fff;
+    }
+    .icon-display {
+      margin-bottom: 0.7rem;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-display .codicon {
+      font-size: 2.2rem;
+      color: #fff;
+    }
+    .icon-display .img-icon {
+      max-width: 40px;
+      max-height: 40px;
+      filter: grayscale(1) brightness(1.2);
+    }
+    .icon-name {
+      font-weight: 500;
+      color: #fff;
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+      word-break: break-word;
+    }
+    .ai-badge {
+      background: #fff;
+      color: #111;
+      padding: 0.15rem 0.6rem;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-top: 0.4rem;
+      display: inline-block;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 0.5rem;
+      }
+      .icon-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>VS Code Icon Inventory</h1>
+    </div>
+
+    <div class="controls">
+      <input class="search-input" type="text" id="searchInput" placeholder="Search icons, descriptions, files...">
+      <div class="filter-section">
+        <div class="view-toggle">
+          <button class="view-btn active" data-view="grid" title="Grid view"><i class="codicon codicon-layout"></i></button>
+          <button class="view-btn" data-view="table" title="Table view"><i class="codicon codicon-list-tree"></i></button>
+        </div>
+        <button id="aiFilterToggle" class="view-btn" title="Show only AI features" aria-pressed="false"><i class="codicon codicon-sparkle"></i></button>
+      </div>
+    </div>
+
+    <!-- Table controls removed for minimalism -->
+
+    <!-- Grid View -->
+    <div id="iconGrid" class="icon-grid"></div>
+
+    <!-- Table View -->
+    <div id="tableContainer" class="table-container" style="display:none">
+      <table id="iconTable" style="width:100%;border-collapse:collapse;background:#181818;color:#fff;">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:0.5rem 0.7rem;">Icon</th>
+            <th style="text-align:left;padding:0.5rem 0.7rem;">Name</th>
+            <th style="text-align:left;padding:0.5rem 0.7rem;">Type</th>
+            <th style="text-align:left;padding:0.5rem 0.7rem;">AI</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer id="statsFooter" style="position:fixed;bottom:0;left:0;width:100%;background:#181818;color:#bbb;font-size:0.95rem;padding:0.5rem 0;text-align:center;z-index:10;letter-spacing:0.01em;"></footer>
+
+  <!-- Modal removed for minimalism -->
+  <script src="icon-inventory.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOMContentLoaded');
+      console.log('window.iconData:', window.iconData);
+      if (!window.iconData || !Array.isArray(window.iconData) || window.iconData.length === 0) {
+        document.body.innerHTML = '<div style="padding:2rem;text-align:center;"><h1>No icon data loaded</h1><p>Check that icon-inventory.js is present and contains data.</p></div>';
+        return;
+      }
+      window.currentData = [...window.iconData];
+      console.log('currentData:', window.currentData);
+      displayStats && displayStats();
+      switchView && switchView('grid');
+      // Attach search and filter events
+      document.getElementById('searchInput').addEventListener('input', filterData);
+      document.getElementById('aiFilterToggle').addEventListener('click', function() {
+        const pressed = this.getAttribute('aria-pressed') === 'true';
+        this.setAttribute('aria-pressed', String(!pressed));
+        if (!pressed) {
+          this.classList.add('active');
+        } else {
+          this.classList.remove('active');
+        }
+        filterData();
+      });
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchView(btn.getAttribute('data-view'));
+        });
+      });
+    });
+    // Check if data is loaded
+    if (typeof iconData === 'undefined') {
+      console.error('iconData is not defined! Make sure icon-inventory.js is loaded.');
+      document.body.innerHTML = '<div style="padding: 2rem; text-align: center;"><h1>Error: Icon data not loaded</h1><p>Please make sure icon-inventory.js exists and is accessible.</p></div>';
+    } else {
+      console.log('Icon data loaded successfully:', iconData.length, 'icons');
+    }
+
+    let currentData = typeof iconData !== 'undefined' ? [...iconData] : [];
+    let sortColumn = '';
+    let sortOrder = 'asc';
+    let currentView = 'grid';
+
+    // Display aggregate stats
+    function displayStats() {
+      const statsFooter = document.getElementById('statsFooter');
+      if (!statsFooter) return;
+      const aiCount = window.iconData.filter(icon => icon.aiRelated).length;
+      if (typeof window.iconMetadata !== 'undefined') {
+        statsFooter.innerHTML = `
+          <span style="margin-right:2em;">Total Icons: <strong>${window.iconMetadata.totalCount}</strong></span>
+          <span style="margin-right:2em;">AI-Related: <i class="codicon codicon-sparkle" style="vertical-align:middle;"></i> <strong>${aiCount}</strong></span>
+          <span style="margin-right:2em;">Total File Size: <strong>${window.iconMetadata.totalFileSizeFormatted}</strong></span>
+          <span>Generated: <strong>${new Date(window.iconMetadata.generatedAt).toLocaleString()}</strong></span>
+        `;
+      } else {
+        statsFooter.innerHTML = `
+          <span style="margin-right:2em;">Total Icons: <strong>${window.iconData.length}</strong></span>
+          <span style="margin-right:2em;">AI-Related: <i class="codicon codicon-sparkle" style="vertical-align:middle;"></i> <strong>${aiCount}</strong></span>
+        `;
+      }
+    }
+
+    // Render grid view
+    function renderGrid(data = currentData) {
+      const grid = document.getElementById('iconGrid');
+      grid.innerHTML = '';
+
+      data.forEach(icon => {
+        const card = document.createElement('div');
+        card.className = 'icon-card';
+
+        const iconDisplay = document.createElement('div');
+        iconDisplay.className = 'icon-display';
+
+        if (icon.iconType === 'codicon') {
+          iconDisplay.innerHTML = `<i class="codicon codicon-${icon.name}" title="${icon.name}"></i>`;
+        } else {
+          iconDisplay.innerHTML = `<img class="img-icon" src="${icon.file}" alt="${icon.name}" title="${icon.name}">`;
+        }
+
+        const iconName = document.createElement('div');
+        iconName.className = 'icon-name';
+        iconName.textContent = icon.name;
+
+        card.appendChild(iconDisplay);
+        card.appendChild(iconName);
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Render table view
+    function renderTable(data = currentData) {
+      const tbody = document.querySelector('#iconTable tbody');
+      tbody.innerHTML = '';
+
+      data.forEach(icon => {
+        const row = document.createElement('tr');
+        row.style.background = '#181818';
+        row.style.borderBottom = '1px solid #222';
+
+        // Icon cell
+        const iconCell = document.createElement('td');
+        iconCell.style.padding = '0.5rem 0.7rem';
+
+        if (icon.iconType === 'codicon') {
+          iconCell.innerHTML = `<i class="codicon codicon-${icon.name}" title="${icon.name}"></i>`;
+        } else {
+          iconCell.innerHTML = `<img class="img-icon" src="${icon.file}" alt="${icon.name}" title="${icon.name}" style="max-width:28px;max-height:28px;filter:grayscale(1) brightness(1.2);">`;
+        }
+
+        // Name cell
+        const nameCell = document.createElement('td');
+        nameCell.textContent = icon.name;
+        nameCell.style.padding = '0.5rem 0.7rem';
+
+        // Type cell
+        const typeCell = document.createElement('td');
+        typeCell.textContent = icon.type;
+        typeCell.style.padding = '0.5rem 0.7rem';
+
+        // AI cell
+        const aiCell = document.createElement('td');
+        aiCell.style.padding = '0.5rem 0.7rem';
+
+        if (icon.aiRelated) {
+          aiCell.innerHTML = '<span class="ai-badge">AI</span>';
+        } else {
+          aiCell.textContent = '';
+        }
+
+        row.appendChild(iconCell);
+        row.appendChild(nameCell);
+        row.appendChild(typeCell);
+        row.appendChild(aiCell);
+        tbody.appendChild(row);
+      });
+    }
+
+    // Switch between views
+    function switchView(view) {
+      currentView = view;
+
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-view') === view);
+      });
+
+      const gridContainer = document.getElementById('iconGrid');
+      const tableContainer = document.getElementById('tableContainer');
+
+      if (view === 'grid') {
+        gridContainer.style.display = 'grid';
+        tableContainer.style.display = 'none';
+        renderGrid(currentData);
+      } else {
+        gridContainer.style.display = 'none';
+        tableContainer.style.display = 'block';
+        renderTable(currentData);
+      }
+    }
+
+    // Filter and search
+    function filterData() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const aiOnly = document.getElementById('aiFilterToggle').getAttribute('aria-pressed') === 'true';
+
+      currentData = iconData.filter(icon => {
+        const matchesSearch = !searchTerm ||
+          icon.name.toLowerCase().includes(searchTerm) ||
+          (icon.desc && icon.desc.toLowerCase().includes(searchTerm)) ||
+          (icon.file && icon.file.toLowerCase().includes(searchTerm)) ||
+          (icon.location && icon.location.toLowerCase().includes(searchTerm));
+
+        const matchesAI = !aiOnly || icon.aiRelated;
+
+        return matchesSearch && matchesAI;
+      });
+
+      if (currentView === 'grid') {
+        renderGrid(currentData);
+      } else {
+        renderTable(currentData);
+      }
+    }
+
+    // Sort functionality
+    function sortData(column) {
+      if (sortColumn === column) {
+        sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn = column;
+        sortOrder = 'asc';
+      }
+
+      currentData.sort((a, b) => {
+        let aVal = a[column] || '';
+        let bVal = b[column] || '';
+
+        if (column === 'count' || column === 'fileSize') {
+          aVal = parseInt(aVal) || 0;
+          bVal = parseInt(bVal) || 0;
+        } else {
+          aVal = aVal.toString().toLowerCase();
+          bVal = bVal.toString().toLowerCase();
+        }
+
+        if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      if (currentView === 'table') {
+        renderTable(currentData);
+      }
+    }
+
+    // Column toggle functionality
+    function toggleColumn(column, show) {
+      const elements = document.querySelectorAll(`[data-col="${column}"]`);
+      elements.forEach(el => {
+        el.style.display = show ? '' : 'none';
+      });
+    }
+
+    // Show icon modal with details
+    function showIconModal(icon) {
+      const modal = document.getElementById('iconModal');
+      const modalIcon = document.getElementById('modalIcon');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalSubtitle = document.getElementById('modalSubtitle');
+      const modalInfo = document.getElementById('modalInfo');
+      const modalUsageList = document.getElementById('modalUsageList');
+      const modalAiTerms = document.getElementById('modalAiTerms');
+      const aiTermsSection = document.getElementById('aiTermsSection');
+      const usageSection = document.getElementById('usageSection');
+
+      // Set icon
+      if (icon.iconType === 'codicon') {
+        modalIcon.innerHTML = `<i class="codicon codicon-${icon.name}" style="font-size: 4rem;"></i>`;
+      } else {
+        modalIcon.innerHTML = `<img class="img-icon" src="${icon.file}" alt="${icon.name}" style="width: 64px; height: 64px;">`;
+      }
+
+      // Set title and subtitle
+      modalTitle.textContent = icon.name;
+      modalSubtitle.textContent = `${icon.type.toUpperCase()} • Usage: ${icon.count} • Size: ${icon.fileSizeFormatted || '0 B'}`;
+
+      // Set basic info
+      const infoItems = [
+        { label: 'Type', value: icon.type },
+        { label: 'Usage Count', value: icon.count },
+        { label: 'File Size', value: icon.fileSizeFormatted || '0 B' }
+      ];
+
+      if (icon.file) {
+        infoItems.push({ label: 'File Path', value: icon.file });
+      }
+
+      if (icon.aiRelated) {
+        infoItems.push({ label: 'AI-Related', value: 'Yes' });
+      }
+
+      modalInfo.innerHTML = infoItems
+        .map(item => `<div class="info-item"><span class="info-label">${item.label}:</span><span class="info-value">${item.value}</span></div>`)
+        .join('');
+
+      // Set usage locations
+      if (icon.usageLocations && icon.usageLocations.length > 0) {
+        const usageList = icon.usageLocations
+          .map(location => `
+            <div class="usage-item">
+              <span class="usage-file">${location.file}</span>
+              <span class="usage-count">${location.count} ${location.count === 1 ? 'usage' : 'usages'}</span>
+            </div>
+          `)
+          .join('');
+        modalUsageList.innerHTML = usageList;
+        usageSection.style.display = 'block';
+      } else {
+        modalUsageList.innerHTML = '<div class="no-usage">No usage found in the codebase.</div>';
+        usageSection.style.display = 'block';
+      }
+
+      // Set AI terms
+      if (icon.aiTerms && icon.aiTerms.length > 0) {
+        const termsList = icon.aiTerms.map(term => `<span class="ai-term">${term}</span>`).join('');
+        modalAiTerms.innerHTML = termsList;
+        aiTermsSection.style.display = 'block';
+      } else if (icon.aiRelated) {
+        modalAiTerms.innerHTML = '<div class="ai-note">Detected as AI-related based on icon name or context.</div>';
+        aiTermsSection.style.display = 'block';
+      } else {
+        aiTermsSection.style.display = 'none';
+      }
+
+      // Show modal
+      modal.style.display = 'flex';
+    }
+
+    // Close modal function
+    function closeModal() {
+      const modal = document.getElementById('iconModal');
+      modal.style.display = 'none';
+    }
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing app...');
+
+      // Initialize modal handlers
+      const modal = document.getElementById('iconModal');
+      const closeBtn = document.querySelector('.close-btn');
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+      }
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+          modal.style.display = 'none';
+        }
+      });
+
+      // Initialize the main app
+      displayStats();
+      switchView('grid'); // Start with grid view
+
+      // Search
+      document.getElementById('searchInput').addEventListener('input', filterData);
+      document.getElementById('aiFilterToggle').addEventListener('click', function() {
+        const pressed = this.getAttribute('aria-pressed') === 'true';
+        this.setAttribute('aria-pressed', String(!pressed));
+        if (!pressed) {
+          this.classList.add('active');
+        } else {
+          this.classList.remove('active');
+        }
+        filterData();
+      });
+
+      // View toggle
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchView(btn.getAttribute('data-view'));
+        });
+      });
+
+      // Sort (only for table view)
+      document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          if (currentView === 'table') {
+            sortData(th.getAttribute('data-sort'));
+          }
+        });
+      });
+
+      // Column toggles
+      document.querySelectorAll('.col-toggle').forEach(toggle => {
+        toggle.addEventListener('change', () => {
+          toggleColumn(toggle.getAttribute('data-col'), toggle.checked);
+        });
+      });
+
+      console.log('App initialization complete');
+    });
+  </script>
+</body>
+</html>
