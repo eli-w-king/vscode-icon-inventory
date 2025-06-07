@@ -21,5 +21,6 @@ This tool lets you visualize and explore all icons used in the Visual Studio Cod
 
 ## Requirements
 
+- VSCode codebase
 - Node.js (for running the generator scripts)
 - Web browser (for viewing the inventory)
