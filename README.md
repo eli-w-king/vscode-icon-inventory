@@ -9,7 +9,7 @@ This tool lets you visualize and explore all icons used in the Visual Studio Cod
 
 ## Usage
 
-1. **Copy the icon inventory tool** (this folder or just the needed files) into the root of your VS Code repo.
+1. **Copy the icon inventory tool** (this repo or just the needed files) into the root of your VS Code repo.
 2. **Run the generator script**:
    ```bash
    node icon-inventory-gen.js
