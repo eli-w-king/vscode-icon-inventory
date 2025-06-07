@@ -17,7 +17,7 @@ This tool lets you visualize and explore all icons used in the Visual Studio Cod
    node icon-inventory-gen.cjs
    ```
    This will scan the VS Code repo and generate up-to-date icon data in `icon-inventory.js`.
-3. **Open `icon-inventory.html` in your browser** (from within the VS Code repo) to view the inventory.
+3. **Open `icon-inventory.html` in your browser** to view the inventory.
 
 ## Requirements
 
